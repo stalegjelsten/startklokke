@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Jaktstart</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #1a4d2e 0%, #2d6a4f 50%, #40916c 100%);
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            touch-action: manipulation;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(26, 77, 46, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 90% 30%, rgba(26, 77, 46, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 30% 70%, rgba(26, 77, 46, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(26, 77, 46, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        header {
+            background: linear-gradient(135deg, rgba(255, 87, 34, 0.95) 0%, rgba(230, 74, 25, 0.95) 100%);
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 4px solid #ff5722;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        header::before,
+        header::after {
+            content: '◇';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2.5rem;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        header::before {
+            left: 1.5rem;
+        }
+
+        header::after {
+            right: 1.5rem;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .current-time {
+            font-size: 1rem;
+            opacity: 0.85;
+            font-weight: 300;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            overflow: hidden;
+            gap: 1rem;
+            position: relative;
+            z-index: 5;
+        }
+
+        .starter {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 1rem;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .starter.slide-out {
+            animation: slideOut 0.5s ease-in forwards;
+        }
+
+        .starter.slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-120%);
+                opacity: 0;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .starter::before {
+            content: '◇';
+            position: absolute;
+            top: 0.8rem;
+            left: 0.8rem;
+            font-size: 1.5rem;
+            color: rgba(255, 87, 34, 0.4);
+            font-weight: bold;
+        }
+
+        .starter.current {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.35) 0%, rgba(255, 152, 0, 0.35) 100%);
+            border: 4px solid #ffc107;
+            box-shadow: 
+                0 12px 40px rgba(255, 193, 7, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .starter.current::before {
+            color: rgba(255, 193, 7, 0.6);
+            animation: pulse-marker 2s infinite;
+        }
+
+        @keyframes pulse-marker {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        .starter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .starter-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .class-name {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 0.2rem;
+            font-weight: 600;
+            color: #ffd54f;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .starter-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .start-time {
+            font-size: 1.3rem;
+            font-weight: 600;
+            opacity: 0.95;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.3rem 0.6rem;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .countdown {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin-top: 0.3rem;
+            margin-bottom: 0.3rem;
+            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+            letter-spacing: 2px;
+        }
+
+        .countdown.warning {
+            color: #ffd54f;
+            text-shadow: 
+                4px 4px 8px rgba(0, 0, 0, 0.5),
+                0 0 20px rgba(255, 193, 7, 0.5);
+        }
+
+        .countdown.danger {
+            color: #ff6b6b;
+            text-shadow: 
+                4px 4px 8px rgba(0, 0, 0, 0.5),
+                0 0 30px rgba(244, 67, 54, 0.7);
+        }
+
+        .countdown.danger.blink {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .status {
+            text-align: center;
+            font-size: 1.1rem;
+            margin-top: 0.3rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+            letter-spacing: 2px;
+        }
+
+        .no-starters {
+            text-align: center;
+            font-size: 2rem;
+            margin-top: 3rem;
+            opacity: 0.8;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .upload-section {
+            background: linear-gradient(135deg, rgba(255, 87, 34, 0.3) 0%, rgba(230, 74, 25, 0.3) 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem;
+            border: 3px solid rgba(255, 87, 34, 0.5);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .upload-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .upload-section input[type="file"] {
+            margin: 1rem 0;
+            padding: 1rem;
+            font-size: 1.1rem;
+            border-radius: 12px;
+            background: white;
+            color: #1a4d2e;
+            border: 3px solid #ff5722;
+            cursor: pointer;
+        }
+
+        .test-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 100;
+        }
+
+        .test-toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            transition: all 0.3s;
+        }
+
+        .test-toggle-label:hover {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .test-toggle input {
+            appearance: none;
+            width: 40px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .test-toggle input:checked {
+            background: #ff9800;
+        }
+
+        .test-toggle input::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+
+        .test-toggle input:checked::before {
+            left: 22px;
+        }
+
+        .test-toggle-text {
+            font-size: 0.75rem;
+            font-weight: 600;
+            opacity: 0.7;
+        }
+
+        .test-toggle input:checked ~ .test-toggle-text {
+            opacity: 1;
+            color: #ff9800;
+        }
+
+        .test-controls {
+            background: rgba(255, 165, 0, 0.3);
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 165, 0, 0.5);
+            display: none;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .test-controls.active {
+            display: flex;
+        }
+
+        .test-controls button {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            background: #ff9800;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .test-controls button:hover {
+            background: #f57c00;
+            transform: scale(1.05);
+        }
+
+        .test-controls button:active {
+            transform: scale(0.95);
+        }
+
+        .time-offset-display {
+            width: 100%;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .starter-name {
+                font-size: 1.5rem;
+            }
+            
+            .countdown {
+                font-size: 2.5rem;
+            }
+
+            header::before,
+            header::after {
+                font-size: 2rem;
+            }
+
+            header::before {
+                left: 1rem;
+            }
+
+            header::after {
+                right: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-toggle">
+        <label class="test-toggle-label">
+            <input type="checkbox" id="testModeToggle">
+            <span class="test-toggle-text">Test</span>
+        </label>
+    </div>
+
+    <header>
+        <h1 id="eventName"></h1>
+        <div class="current-time" id="currentTime"></div>
+    </header>
+
+    <div class="test-controls" id="testControls">
+        <button onclick="setTestTime(-60)">-1 min</button>
+        <button onclick="setTestTime(-10)">-10 sek</button>
+        <button onclick="simulateRaceTime()">Simuler løpstid</button>
+        <button onclick="setTestTime(10)">+10 sek</button>
+        <button onclick="setTestTime(60)">+1 min</button>
+        <button onclick="resetTime()">Reset</button>
+        <div class="time-offset-display" id="timeOffsetDisplay"></div>
+    </div>
+
+    <main id="starterContainer">
+        <div class="upload-section" id="uploadSection">
+            <h2>Last opp startliste</h2>
+            <p style="margin: 1rem 0; font-size: 1.1rem;">Velg XML-fil med startliste</p>
+            <input type="file" id="fileInput" accept=".xml">
+        </div>
+    </main>
+
+    <script>
+        let starters = [];
+        let updateInterval;
+        let eventName = '';
+        let timeOffset = 0;
+        let testMode = false;
+        let lastBeepSecond = -1;
+        let lastBeepTime = 0;  // Timestamp for siste beep
+        let lastBeepStarterId = null;  // ID for løper som sist ble beepet for
+        let displayedStarterIds = [];
+
+        function playBeep(duration = 100, frequency = 800) {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = frequency;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + duration / 1000);
+            } catch (e) {
+                // Lyd ikke tilgjengelig
+            }
+        }
+
+        document.getElementById('testModeToggle').addEventListener('change', function(e) {
+            testMode = e.target.checked;
+            document.getElementById('testControls').classList.toggle('active', testMode);
+            if (!testMode) {
+                timeOffset = 0;
+            }
+            updateDisplay();
+        });
+
+        function getCurrentTime() {
+            return new Date(Date.now() + timeOffset);
+        }
+
+        function setTestTime(seconds) {
+            if (!testMode) return;
+            timeOffset += seconds * 1000;
+            updateDisplay();
+        }
+
+        function simulateRaceTime() {
+            if (!testMode || starters.length === 0) return;
+            const now = new Date();
+            // Sett til 1 minutt før første startende løper
+            const firstStartTime = new Date(starters[0].startTime);
+            firstStartTime.setMinutes(firstStartTime.getMinutes() - 1);
+            timeOffset = firstStartTime - now;
+            updateDisplay();
+        }
+
+        function resetTime() {
+            if (!testMode) return;
+            timeOffset = 0;
+            updateDisplay();
+        }
+
+        function updateTimeOffsetDisplay() {
+            if (testMode && timeOffset !== 0) {
+                const offsetMin = Math.floor(timeOffset / 60000);
+                const offsetSec = Math.floor((timeOffset % 60000) / 1000);
+                document.getElementById('timeOffsetDisplay').textContent = 
+                    `Tidsforskyvning: ${offsetMin > 0 ? '+' : ''}${offsetMin}m ${offsetSec}s`;
+            } else {
+                document.getElementById('timeOffsetDisplay').textContent = '';
+            }
+        }
+
+        function parseXML(xmlText) {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+            
+            // Hent eventnavn
+            const eventElement = xmlDoc.getElementsByTagName('Event')[0];
+            let eventName = 'Orienteringsløp';
+            
+            if (eventElement) {
+                const nameElement = eventElement.getElementsByTagName('Name')[0];
+                if (nameElement) {
+                    eventName = nameElement.textContent.trim();
+                }
+            }
+            
+            document.getElementById('eventName').textContent = eventName;
+            document.title = eventName;
+            
+            const parsedStarters = [];
+            const classElements = xmlDoc.getElementsByTagName('ClassStart');
+            
+            for (let i = 0; i < classElements.length; i++) {
+                const classElement = classElements[i];
+                
+                // Hent klassenavn
+                const classObj = classElement.getElementsByTagName('Class')[0];
+                let className = 'Ukjent klasse';
+                
+                if (classObj) {
+                    const nameElement = classObj.getElementsByTagName('Name')[0];
+                    if (nameElement) {
+                        className = nameElement.textContent.trim();
+                    }
+                }
+                
+                const personStarts = classElement.getElementsByTagName('PersonStart');
+                
+                for (let j = 0; j < personStarts.length; j++) {
+                    const personStart = personStarts[j];
+                    
+                    const person = personStart.getElementsByTagName('Person')[0];
+                    let given = '';
+                    let family = '';
+                    
+                    if (person) {
+                        const nameElement = person.getElementsByTagName('Name')[0];
+                        
+                        if (nameElement) {
+                            const givenElement = nameElement.getElementsByTagName('Given')[0];
+                            const familyElement = nameElement.getElementsByTagName('Family')[0];
+                            
+                            given = givenElement ? givenElement.textContent.trim() : '';
+                            family = familyElement ? familyElement.textContent.trim() : '';
+                        }
+                    }
+                    
+                    const startElement = personStart.getElementsByTagName('Start')[0];
+                    const startTimeElement = startElement ? startElement.getElementsByTagName('StartTime')[0] : null;
+                    const startTimeStr = startTimeElement ? startTimeElement.textContent.trim() : null;
+                    
+                    if (startTimeStr && (given || family)) {
+                        const startTime = new Date(startTimeStr);
+                        const fullName = `${given} ${family}`.trim();
+                        
+                        parsedStarters.push({
+                            id: `${className}-${fullName}-${startTimeStr}`,
+                            name: fullName,
+                            class: className,
+                            startTime: startTime,
+                            startTimeStr: startTime.toLocaleTimeString('no-NO', { 
+                                hour: '2-digit', 
+                                minute: '2-digit', 
+                                second: '2-digit' 
+                            })
+                        });
+                    }
+                }
+            }
+            
+            parsedStarters.sort((a, b) => a.startTime - b.startTime);
+            
+            return parsedStarters;
+        }
+
+        document.getElementById('fileInput')?.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    starters = parseXML(event.target.result);
+                    document.getElementById('uploadSection').style.display = 'none';
+                    startDisplay();
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function updateCurrentTime() {
+            const now = getCurrentTime();
+            document.getElementById('currentTime').textContent = 
+                now.toLocaleString('no-NO', { 
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            updateTimeOffsetDisplay();
+        }
+
+        function displayStarters() {
+            const now = getCurrentTime();
+            const container = document.getElementById('starterContainer');
+            
+            const upcomingStarters = starters.filter(s => {
+                const timeDiff = (s.startTime - now) / 1000;
+                return timeDiff > -1;  // Forsvinner etter 1 sekund
+            });
+
+            if (upcomingStarters.length === 0) {
+                container.innerHTML = '<div class="no-starters">Alle deltakere har startet! 🎉</div>';
+                return;
+            }
+
+            const nextFour = upcomingStarters.slice(0, 4);
+            const newStarterIds = nextFour.map(s => s.id);
+            
+            // Finn starttiden til første løper
+            const firstStartTime = nextFour.length > 0 ? nextFour[0].startTime.getTime() : 0;
+            
+            // Sjekk om listen har endret seg
+            const hasChanged = displayedStarterIds.length !== newStarterIds.length || 
+                               displayedStarterIds.some((id, idx) => id !== newStarterIds[idx]);
+            
+            if (!hasChanged) {
+                // Kun oppdater innhold uten å endre DOM-struktur
+                nextFour.forEach((starter, index) => {
+                    const element = document.querySelector(`[data-starter-id="${starter.id}"]`);
+                    if (element) {
+                        const startsWithFirst = starter.startTime.getTime() === firstStartTime;
+                        updateStarterContent(element, starter, index, now, startsWithFirst);
+                    }
+                });
+                return;
+            }
+            
+            // Sjekk om en starter har forsvunnet (startet)
+            const removedStarters = displayedStarterIds.filter(id => !newStarterIds.includes(id));
+            
+            if (removedStarters.length > 0) {
+                // Animer ut startere som har startet
+                removedStarters.forEach(id => {
+                    const element = document.querySelector(`[data-starter-id="${id}"]`);
+                    if (element) {
+                        element.classList.add('slide-out');
+                    }
+                });
+                
+                // Vent på animasjon før oppdatering
+                setTimeout(() => {
+                    updateStarterDisplay(nextFour, now, firstStartTime);
+                    displayedStarterIds = newStarterIds;
+                }, 500);
+            } else {
+                updateStarterDisplay(nextFour, now, firstStartTime);
+                displayedStarterIds = newStarterIds;
+            }
+        }
+
+        function updateStarterContent(element, starter, index, now, startsWithFirst) {
+            const timeDiff = Math.floor((starter.startTime - now) / 1000);
+            
+            let statusClass = '';
+            let countdownClass = '';
+            let statusText = '';
+            
+            // Beep kun for første løper, med minimum 800ms mellom beeps
+            const timeSinceLastBeep = Date.now() - lastBeepTime;
+            const shouldBeep = index === 0 && timeSinceLastBeep >= 800;
+            
+            if (shouldBeep && timeDiff === 0 && (timeDiff !== lastBeepSecond || starter.id !== lastBeepStarterId)) {
+                lastBeepSecond = timeDiff;
+                lastBeepStarterId = starter.id;
+                lastBeepTime = Date.now();
+                playBeep(400, 800); // Lang beep når det starter
+            } else if (shouldBeep && timeDiff >= 1 && timeDiff <= 4 && (timeDiff !== lastBeepSecond || starter.id !== lastBeepStarterId)) {
+                lastBeepSecond = timeDiff;
+                lastBeepStarterId = starter.id;
+                lastBeepTime = Date.now();
+                playBeep(100, 600); // Korte beeps ved 1-4 sekunder
+            }
+            
+            if (timeDiff <= 0) {
+                statusText = 'KJØR! 🚀';
+                countdownClass = 'danger';
+                if (timeDiff < 0) {
+                    lastBeepSecond = -1;
+                    lastBeepStarterId = null;
+                }
+            } else if (timeDiff <= 5) {
+                // Marker som current kun hvis løperen starter samtidig som den første
+                statusClass = startsWithFirst ? 'current' : '';
+                countdownClass = 'danger';
+            } else if (timeDiff <= 30) {
+                statusClass = startsWithFirst ? 'current' : '';
+                countdownClass = 'warning';
+                lastBeepSecond = -1;
+                lastBeepStarterId = null;
+            } else {
+                statusClass = startsWithFirst ? 'current' : '';
+                lastBeepSecond = -1;
+                lastBeepStarterId = null;
+            }
+
+            const minutes = Math.floor(Math.abs(timeDiff) / 60);
+            const seconds = Math.abs(timeDiff) % 60;
+            const countdownText = timeDiff <= 0 
+                ? 'KJØR!' 
+                : (minutes > 0 
+                    ? `${minutes}:${seconds.toString().padStart(2, '0')}` 
+                    : `${seconds} sek`);
+
+            // Blink kun for løpere som starter samtidig som den første OG har <= 5 sekunder
+            const blinkClass = (timeDiff > 0 && timeDiff <= 5 && startsWithFirst) ? 'blink' : '';
+
+            // Oppdater klasser
+            element.className = `starter ${statusClass}`;
+            
+            // Oppdater countdown
+            const countdownEl = element.querySelector('.countdown');
+            if (countdownEl) {
+                countdownEl.className = `countdown ${countdownClass} ${blinkClass}`;
+                countdownEl.textContent = countdownText;
+            }
+            
+            // Oppdater status
+            const statusEl = element.querySelector('.status');
+            if (statusText) {
+                if (!statusEl) {
+                    const newStatusEl = document.createElement('div');
+                    newStatusEl.className = 'status';
+                    newStatusEl.textContent = statusText;
+                    element.appendChild(newStatusEl);
+                } else {
+                    statusEl.textContent = statusText;
+                }
+            } else if (statusEl) {
+                statusEl.remove();
+            }
+        }
+
+        function updateStarterDisplay(nextFour, now, firstStartTime) {
+            const container = document.getElementById('starterContainer');
+            
+            container.innerHTML = nextFour.map((starter, index) => {
+                const timeDiff = Math.floor((starter.startTime - now) / 1000);
+                const startsWithFirst = starter.startTime.getTime() === firstStartTime;
+                
+                let statusClass = '';
+                let countdownClass = '';
+                let statusText = '';
+                
+                // Beep kun for første løper, med minimum 800ms mellom beeps
+                const timeSinceLastBeep = Date.now() - lastBeepTime;
+                const shouldBeep = index === 0 && timeSinceLastBeep >= 800;
+                
+                if (shouldBeep && timeDiff === 0 && (timeDiff !== lastBeepSecond || starter.id !== lastBeepStarterId)) {
+                    lastBeepSecond = timeDiff;
+                    lastBeepStarterId = starter.id;
+                    lastBeepTime = Date.now();
+                    playBeep(400, 800);
+                } else if (shouldBeep && timeDiff >= 1 && timeDiff <= 4 && (timeDiff !== lastBeepSecond || starter.id !== lastBeepStarterId)) {
+                    lastBeepSecond = timeDiff;
+                    lastBeepStarterId = starter.id;
+                    lastBeepTime = Date.now();
+                    playBeep(100, 600);
+                }
+                
+                if (timeDiff <= 0) {
+                    statusText = 'KJØR! 🚀';
+                    countdownClass = 'danger';
+                    if (timeDiff < 0) {
+                        lastBeepSecond = -1;
+                        lastBeepStarterId = null;
+                    }
+                } else if (timeDiff <= 5) {
+                    // Marker som current kun hvis løperen starter samtidig som den første
+                    statusClass = startsWithFirst ? 'current' : '';
+                    countdownClass = 'danger';
+                } else if (timeDiff <= 30) {
+                    statusClass = startsWithFirst ? 'current' : '';
+                    countdownClass = 'warning';
+                    lastBeepSecond = -1;
+                    lastBeepStarterId = null;
+                } else {
+                    statusClass = startsWithFirst ? 'current' : '';
+                    lastBeepSecond = -1;
+                    lastBeepStarterId = null;
+                }
+
+                const minutes = Math.floor(Math.abs(timeDiff) / 60);
+                const seconds = Math.abs(timeDiff) % 60;
+                const countdownText = timeDiff <= 0 
+                    ? 'KJØR!' 
+                    : (minutes > 0 
+                        ? `${minutes}:${seconds.toString().padStart(2, '0')}` 
+                        : `${seconds} sek`);
+
+                // Blink kun for løpere som starter samtidig som den første OG har <= 5 sekunder
+                const blinkClass = (timeDiff > 0 && timeDiff <= 5 && startsWithFirst) ? 'blink' : '';
+
+                return `
+                    <div class="starter ${statusClass}" data-starter-id="${starter.id}">
+                        <div class="class-name">${starter.class}</div>
+                        <div class="starter-header">
+                            <div class="starter-info">
+                                <div class="starter-name">${starter.name}</div>
+                            </div>
+                            <div class="start-time">⏱️ ${starter.startTimeStr}</div>
+                        </div>
+                        <div class="countdown ${countdownClass} ${blinkClass}">${countdownText}</div>
+                        ${statusText ? `<div class="status">${statusText}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function startDisplay() {
+            updateDisplay();
+            
+            if (updateInterval) clearInterval(updateInterval);
+            updateInterval = setInterval(updateDisplay, 1000);
+        }
+
+        function updateDisplay() {
+            updateCurrentTime();
+            if (starters.length > 0) {
+                displayStarters();
+            }
+        }
+
+        setInterval(updateCurrentTime, 1000);
+        updateCurrentTime();
+    </script>
+</body>
+</html>
