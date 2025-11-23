@@ -1,0 +1,2 @@
+# startklokke
+Startklokke for orienteringsløp
