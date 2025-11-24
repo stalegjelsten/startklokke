@@ -87,13 +87,57 @@
 
         main {
             flex: 1;
-            display: flex;
-            flex-direction: column;
             padding: 1.5rem;
-            overflow: hidden;
-            gap: 1rem;
+            overflow-y: auto;
+            overflow-x: hidden;
             position: relative;
             z-index: 5;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #starterContainer {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .primary-starters {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            min-height: calc(100vh - 180px); /* Minimum viewport minus header og padding */
+            flex-shrink: 0;
+        }
+        
+        .primary-starters .starter {
+            flex: 1;
+            min-height: 120px; /* Minimum høyde for å sikre at styling vises */
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Juster primary-starters for landscape - kan bruke fast height */
+        @media (max-width: 1200px) and (max-height: 800px) and (orientation: landscape) {
+            .primary-starters {
+                height: calc(100vh - 150px);
+                min-height: auto;
+            }
+            
+            .primary-starters .starter {
+                min-height: 80px;
+            }
+        }
+        
+        /* Portrait mode - tillat scrolling for å se alle 8 */
+        @media (orientation: portrait) {
+            .primary-starters {
+                min-height: auto; /* La innholdet bestemme høyden */
+            }
+            
+            .primary-starters .starter {
+                min-height: 100px;
+            }
         }
 
         .starter {
@@ -199,7 +243,7 @@
         }
 
         .starter-name {
-            font-size: 1.5rem;
+            font-size: 2rem;
             font-weight: 700;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
             white-space: nowrap;
@@ -220,13 +264,13 @@
         }
 
         .countdown {
-            font-size: 2rem;
+            font-size: 3rem;
             font-weight: 700;
             text-align: center;
-            margin-top: 0.3rem;
+            margin-top: 0.5rem;
             margin-bottom: 0.3rem;
             text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
-            letter-spacing: 2px;
+            letter-spacing: 3px;
         }
 
         .countdown.warning {
@@ -267,6 +311,63 @@
             margin-top: 3rem;
             opacity: 0.8;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .upcoming-section {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .upcoming-starter {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 0.6rem 0.8rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .upcoming-starter:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .upcoming-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .upcoming-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+        }
+
+        .upcoming-class {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .upcoming-time {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .upcoming-start-time {
+            font-size: 0.85rem;
+            font-weight: 600;
+            opacity: 0.9;
+            margin-bottom: 0.1rem;
+        }
+
+        .upcoming-countdown {
+            font-size: 0.75rem;
+            opacity: 0.7;
         }
 
         .upload-section {
@@ -460,7 +561,7 @@
             }
             
             .starter-name {
-                font-size: 1.1rem;
+                font-size: 1.5rem;
             }
             
             .start-time {
@@ -469,13 +570,13 @@
             }
             
             .countdown {
-                font-size: 1.6rem;
-                margin-top: 0.2rem;
+                font-size: 2.2rem;
+                margin-top: 0.3rem;
                 margin-bottom: 0.2rem;
             }
             
             .status {
-                font-size: 0.85rem;
+                font-size: 1rem;
             }
         }
 
@@ -494,7 +595,7 @@
             }
             
             .starter-name {
-                font-size: 1.3rem;
+                font-size: 1.6rem;
             }
             
             /* Skjul starttid på mobil for å gi plass til countdown */
@@ -503,13 +604,13 @@
             }
             
             .countdown {
-                font-size: 2.2rem;
+                font-size: 2.5rem;
                 margin-top: 0.4rem;
                 margin-bottom: 0.2rem;
             }
             
             .status {
-                font-size: 1rem;
+                font-size: 1.1rem;
             }
 
             header::before,
@@ -558,17 +659,17 @@
             }
             
             .starter-name {
-                font-size: 1.1rem;
+                font-size: 1.4rem;
             }
             
             .countdown {
-                font-size: 1.8rem;
+                font-size: 2.2rem;
                 margin-top: 0.3rem;
                 margin-bottom: 0.2rem;
             }
             
             .status {
-                font-size: 0.9rem;
+                font-size: 1rem;
             }
             
             .upload-section {
@@ -809,6 +910,12 @@
             updateTimeOffsetDisplay();
         }
 
+        function getVisibleStartersCount() {
+            // Sjekk aspect ratio
+            const isLandscape = window.innerWidth > window.innerHeight;
+            return isLandscape ? 4 : 8;
+        }
+
         function displayStarters() {
             const now = getCurrentTime();
             const container = document.getElementById('starterContainer');
@@ -823,11 +930,13 @@
                 return;
             }
 
-            const nextFour = upcomingStarters.slice(0, 4);
-            const newStarterIds = nextFour.map(s => s.id);
+            const visibleCount = getVisibleStartersCount();
+            const nextVisible = upcomingStarters.slice(0, visibleCount);
+            const nextUpcoming = upcomingStarters.slice(visibleCount, visibleCount + 25);
+            const newStarterIds = nextVisible.map(s => s.id);
             
             // Finn starttiden til første løper
-            const firstStartTime = nextFour.length > 0 ? nextFour[0].startTime.getTime() : 0;
+            const firstStartTime = nextVisible.length > 0 ? nextVisible[0].startTime.getTime() : 0;
             
             // Sjekk om listen har endret seg
             const hasChanged = displayedStarterIds.length !== newStarterIds.length || 
@@ -835,13 +944,16 @@
             
             if (!hasChanged) {
                 // Kun oppdater innhold uten å endre DOM-struktur
-                nextFour.forEach((starter, index) => {
+                nextVisible.forEach((starter, index) => {
                     const element = document.querySelector(`[data-starter-id="${starter.id}"]`);
-                    if (element) {
+                    if (element && !element.classList.contains('upcoming-starter')) {
                         const startsWithFirst = starter.startTime.getTime() === firstStartTime;
                         updateStarterContent(element, starter, index, now, startsWithFirst);
                     }
                 });
+                
+                // Oppdater upcoming startere
+                updateUpcomingStarters(nextUpcoming, now);
                 return;
             }
             
@@ -852,18 +964,18 @@
                 // Animer ut startere som har startet
                 removedStarters.forEach(id => {
                     const element = document.querySelector(`[data-starter-id="${id}"]`);
-                    if (element) {
+                    if (element && !element.classList.contains('upcoming-starter')) {
                         element.classList.add('slide-out');
                     }
                 });
                 
                 // Vent på animasjon før oppdatering
                 setTimeout(() => {
-                    updateStarterDisplay(nextFour, now, firstStartTime);
+                    updateStarterDisplay(nextVisible, nextUpcoming, now, firstStartTime);
                     displayedStarterIds = newStarterIds;
                 }, 300);
             } else {
-                updateStarterDisplay(nextFour, now, firstStartTime);
+                updateStarterDisplay(nextVisible, nextUpcoming, now, firstStartTime);
                 displayedStarterIds = newStarterIds;
             }
         }
@@ -954,10 +1066,10 @@
             }
         }
 
-        function updateStarterDisplay(nextFour, now, firstStartTime) {
+        function updateStarterDisplay(nextVisible, nextUpcoming, now, firstStartTime) {
             const container = document.getElementById('starterContainer');
             
-            container.innerHTML = nextFour.map((starter, index) => {
+            const visibleHTML = nextVisible.map((starter, index) => {
                 const timeDiff = Math.floor((starter.startTime - now) / 1000);
                 const startsWithFirst = starter.startTime.getTime() === firstStartTime;
                 
@@ -1032,6 +1144,56 @@
                     </div>
                 `;
             }).join('');
+            
+            // Legg til upcoming startere
+            const upcomingHTML = nextUpcoming.map((starter) => {
+                const timeDiff = Math.floor((starter.startTime - now) / 1000);
+                const minutes = Math.floor(Math.abs(timeDiff) / 60);
+                const seconds = Math.abs(timeDiff) % 60;
+                const timeUntil = minutes > 0 
+                    ? `${minutes}:${seconds.toString().padStart(2, '0')}` 
+                    : `${seconds}s`;
+                
+                return `
+                    <div class="upcoming-starter" data-starter-id="${starter.id}">
+                        <div class="upcoming-info">
+                            <div class="upcoming-name">${starter.name}</div>
+                            <div class="upcoming-class">${starter.class}</div>
+                        </div>
+                        <div class="upcoming-time">
+                            <div class="upcoming-start-time">${starter.startTimeStr}</div>
+                            <div class="upcoming-countdown">${timeUntil}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = `
+                <div class="primary-starters">${visibleHTML}</div>
+                ${upcomingHTML ? `<div class="upcoming-section">${upcomingHTML}</div>` : ''}
+            `;
+        }
+        
+        function updateUpcomingStarters(nextUpcoming, now) {
+            const upcomingSection = document.querySelector('.upcoming-section');
+            if (!upcomingSection) return;
+            
+            nextUpcoming.forEach((starter) => {
+                const element = document.querySelector(`.upcoming-starter[data-starter-id="${starter.id}"]`);
+                if (element) {
+                    const timeDiff = Math.floor((starter.startTime - now) / 1000);
+                    const minutes = Math.floor(Math.abs(timeDiff) / 60);
+                    const seconds = Math.abs(timeDiff) % 60;
+                    const timeUntil = minutes > 0 
+                        ? `${minutes}:${seconds.toString().padStart(2, '0')}` 
+                        : `${seconds}s`;
+                    
+                    const countdownEl = element.querySelector('.upcoming-countdown');
+                    if (countdownEl) {
+                        countdownEl.textContent = timeUntil;
+                    }
+                }
+            });
         }
 
         function startDisplay() {
