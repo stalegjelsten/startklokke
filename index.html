@@ -717,6 +717,7 @@
     <header>
         <h1 id="eventName">Startklokke</h1>
         <div class="current-time" id="currentTime"></div>
+        <button id="enableAudioBtn" onclick="initAudio()" style="position: absolute; top: 50%; right: 10rem; transform: translateY(-50%); padding: 0.5rem 1rem; background: #ff9800; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">🔊 Aktiver lyd</button>
     </header>
 
     <main id="starterContainer">
@@ -736,10 +737,42 @@
         let lastBeepTime = 0;  // Timestamp for siste beep
         let lastBeepStarterId = null;  // ID for løper som sist ble beepet for
         let displayedStarterIds = [];
+        let audioContext = null;
+        let audioEnabled = false;
+
+        function initAudio() {
+            try {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                // iOS krever at vi starter og stopper en lyd for å "låse opp" audio
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                gainNode.gain.value = 0.001; // Nesten stille
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.01);
+                
+                audioEnabled = true;
+                
+                // Skjul audio-enable knappen hvis den finnes
+                const audioBtn = document.getElementById('enableAudioBtn');
+                if (audioBtn) {
+                    audioBtn.style.display = 'none';
+                }
+                
+                return true;
+            } catch (e) {
+                console.error('Could not init audio:', e);
+                return false;
+            }
+        }
 
         function playBeep(duration = 100, frequency = 800) {
+            if (!audioEnabled || !audioContext) return;
+            
             try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
                 
@@ -885,6 +918,9 @@
         document.getElementById('fileInput')?.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
+                // Aktiver lyd (kreves på iOS)
+                initAudio();
+                
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     starters = parseXML(event.target.result);
